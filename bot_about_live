@@ -1,0 +1,41 @@
+import time
+
+import requests
+from bs4 import BeautifulSoup
+
+import telebot
+from telebot import types
+from telebot import Handler
+bot=telebot.TeleBot('5558382322:AAGDpRchfzM8i9PT0JO94fhWvdqDue6bwUU')
+@bot.message_handler(content_types=['text'])
+def hihi(message):
+
+
+
+    url='https://soccer365.ru/online/&tab=1'
+    r=requests.get(url)
+    inf=BeautifulSoup(r.text,'lxml')
+    match=inf.find_all('div',class_='game_block online')
+    total=[c.text for c in match]
+
+    for i in range(len(total)):
+        goal=total[i].split('\n')
+        clear=' '.join(goal)
+
+        if goal[2].isalnum()==False:
+            k=list(goal[2])
+            k.remove("'")
+            minute=int(''.join(k))
+        else:
+            minute=45
+        try:
+            first=int(goal[6])
+            second=int(goal[10])
+            a=first+second
+            if (minute<=20 and a>=2) or (minute<=35 and a>=3) or minute<=45 and a>=4 or a>=4:
+                bot.send_message(message.chat.id, clear)
+        except ValueError:
+            bot.send_message(message.chat.id, clear)
+
+bot.polling()
+
