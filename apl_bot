@@ -1,0 +1,26 @@
+import time
+import requests
+from bs4 import BeautifulSoup
+import telebot
+
+while True:
+    r = requests.get('https://1xstavka.ru/live/football/2203560-apl-6x6',proxies={"http":"http://85.113.214.3"},headers={'User Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.124 YaBrowser/22.9.2.1495 Yowser/2.5 Safari/537.36'})
+    s = BeautifulSoup(r.text, 'lxml')
+    chat_id = 958968720
+    bot = telebot.TeleBot('5558382322:AAGDpRchfzM8i9PT0JO94fhWvdqDue6bwUU')
+    try:
+        l = s.find_all('span', class_='c-events-scoreboard__cell c-events-scoreboard__cell--all')
+        goal = [goal.text for goal in l]
+        goals = int(goal[0]) + int(goal[1])
+        teams = s.find('span', class_='c-events__teams').find('span', class_='n').text
+        clear_teams = teams.split('\n')
+        times = s.find('div', class_='c-events__time').find_next().text
+        clear_time = int(times[0:2])
+        if clear_time <= 4 and goals >= 2 or clear_time <= 6 and goals >= 3 or clear_time <= 12 and goals >= 5 or clear_time <= 15 and goals >= 6 or goals >= 7:
+            bot.send_message(chat_id=chat_id,
+                             text=f"{times}    {clear_teams[1]}    {clear_teams[2]}  {goal[0]} ==== {goal[1]}       ")
+
+
+    except:
+        print('s')
+    time.sleep(90)
